@@ -31,8 +31,7 @@ URL: https://code.google.com/p/io-2012-slides
           <section>
             <ul>
               <li>CURE is a non-profit organization that operates hospitals and programs in 27 countries worldwide  treating conditions like clubfoot and hydrocephalus.</li>          
-              <li>I have been developing for the web for the last 16 years and I love working on the cutting edge</li>
-              <li>I did server side JS way back in 1997! (Any one remember Netscape Livewire?)</li>             
+              <li>I have been developing for the web for the last 16 years and I love working on the cutting edge</li>             
             </ul>        
           </section>
         </aside>
@@ -215,14 +214,14 @@ URL: https://code.google.com/p/io-2012-slides
         </hgroup>
         <article>
             <pre class="prettyprint" data-lang="html">
-        &lt;html manifest="manifest.appcache"&gt;
+        &lt;html <b>manifest="manifest.appcache"</b>&gt;
             </pre>
             <pre class="prettyprint" data-lang="appcache">
         CACHE MANIFEST
         #version 1.0
         
-        CACHE:
-        #files required for offline        
+        <b>CACHE:
+        #files required for offline</b>        
         /css/mycss.min.css
         /images/lol_cat.png
         /js/myjs.min.js
@@ -598,6 +597,7 @@ idxRequest.onsuccess = function(successEvent) {//Found cat beards!!!!};
                     <li>Polyfill uses WebSQL to add support for IndexedDB to most browsers: <a href="http://nparashuram.com/IndexedDBShim/">http://nparashuram.com/IndexedDBShim</a>
                     <li>Most notably adds IOS and Android browser support</li>
                     <li>76% global browser support</li>
+                    <li>Polyfill now partially supports Structured Cloning Algorithm: <a href="https://github.com/axemclion/IndexedDBShim/pull/68">GitHub pull request</a></li>
                 </ul>        
             </section>
         </aside>
@@ -619,7 +619,6 @@ idxRequest.onsuccess = function(successEvent) {//Found cat beards!!!!};
                     <li>FileSystem API allows web apps to read and write files in sandboxed section of the user's local file system.</li>
                     <li>Async APIs just like indexedDB</li>          
                     <li>Used for offline storage of photos.</li>
-                    <li>Browser support pretty limited, primarily chrome: <a href="http://caniuse.com/#feat=filesystem">http://caniuse.com/#feat=filesystem</a></li>
                 </ul>        
             </section>
         </aside>
@@ -636,7 +635,7 @@ idxRequest.onsuccess = function(successEvent) {//Found cat beards!!!!};
             <section>
                 <ul>
                     <li>File storage can be PERSISTENT or TEMPORARY.</li>
-                    <li>There is an API to ask for a certain amount of storage.</li>
+                    <li>Chrome uses the requestQuota function to ask the user for a certain amount of storage.</li>
                     <li>This example reads a file from a file input field and stores it locally.</li>
                 </ul>        
             </section>
@@ -651,20 +650,20 @@ function handleError(errorEvent) {
     console.log('Error with filesystem API'); //Async error handler
 }
 function openFileSystem() {
-    window.requestFileSystem(PERSISTENT, size, handleOpenFileSystem, handleError);
+    <b>window.requestFileSystem(PERSISTENT, size, handleOpenFileSystem, handleError);</b>
 }
 function handleOpenFileSystem(newFileSystem) {
     fileSystem = newFileSystem;
-    //Save file from <b>&lt;input type="file" name="fileinput" id="fileinput"&gt;</b>
+    <b>//Save file from &lt;input type="file" name="fileinput" id="fileinput"&gt;</b>
     var fileToSave = document.querySelector('#fileinput').files[0];
-    fileSystem.root.getFile(fileToSave.name, {create: true, exclusive: true}, function(fileEntry) {        
-        fileEntry.createWriter(function(fileWriter) {
-            fileWriter.write(fileToSave);
+    <b>fileSystem.root.getFile</b>(fileToSave.name, {create: true, exclusive: true}, function(fileEntry) {        
+        <b>fileEntry.createWriter</b>(function(fileWriter) {
+            <b>fileWriter.write(fileToSave);</b>
             console.log("file available at:"+fileEntry.toURL());
         }, handleError);
     }, handleError);    
 }
-window.webkitStorageInfo.requestQuota(PERSISTENT, size, openFileSystem, handleError);
+<b>navigator.webkitPersistentStorage.requestQuota(PERSISTENT, size, openFileSystem, handleError);</b>
             </pre>
         </article>
     </slide>
@@ -686,15 +685,15 @@ window.webkitStorageInfo.requestQuota(PERSISTENT, size, openFileSystem, handleEr
 &lt;script&gt;
 function getFileAsDataURL(fileSystem) {
   //First get the file entry representing the call (async response)
-  fileSystem.root.getFile('lol_cat.jpg', {}, function(fileEntry) {
+  <b>fileSystem.root.getFile('lol_cat.jpg', {}, function(fileEntry) {</b>
     //Next get the actual file (async response)      
-    fileEntry.file(function(fileToRead) {
+    <b>fileEntry.file(function(fileToRead) {</b>
         //Next read the file as dataURL(async response)      
-       var reader = new FileReader();
+       <b>var reader = new FileReader()
        reader.onloadend = function(readerEvent) {           
          var dataURL = readerEvent.target.result;         
        };
-       reader.readAsDataURL(fileToRead);
+       reader.readAsDataURL(fileToRead);</b>
     }, handleError);
   }, handleError);
 }
@@ -703,6 +702,42 @@ window.requestFileSystem(PERSISTENT, size, getFileAsDataURL, handleError);
             </pre>
         </article>
     </slide>
+    <slide>
+        <aside class="note">
+            <section>
+                <ul>
+                    <li>For ExtJS apps, I created a proxy for the FileSystem API</li>
+                    <li>That data uri can then be sent via ajax and turned back into a file on the server via PHP.</li>
+                </ul>
+            </section>
+        </aside>            
+        <hgroup>
+            <h2>Adequate Weaponry: Ext.data.proxy.FileSystem</h2>
+        </hgroup>
+        <article>
+            <pre class="prettyprint" data-lang="javascript">
+&lt;script&gt;
+    var store = Ext.create('Ext.data.TreeStore', {
+        autoSync: true,
+        autoLoad: true,
+        <b>proxy: {
+            type: 'filesystem', //Use Ext.data.proxy.FileSystem
+            size: (1024*1024*1024) //Request 1GB of file storage
+        },</b>
+        root: {
+            text: 'My Photos',            
+            expanded: true
+        },
+        <b>fields: [ //Fields used by FileSystem proxy
+            'file', //The actual File object
+            'text', //The name of the file
+            'url' //filesystem url -- eg filesystem:http://example.com/persistent/myfile.png
+        ]</b>
+    });
+&lt;/script&gt;
+            </pre>
+        </article>
+    </slide> 
     <slide class="fill nobackground" style="background: url(images/canifileapi.png) no-repeat center;">
         <aside class="note">
             <section>
@@ -721,7 +756,46 @@ window.requestFileSystem(PERSISTENT, size, getFileAsDataURL, handleError);
                 source: caniuse.com/#feat=offline-apps<br/>github.com/mastahyeti/browserstats
             </footer>
         </article>
-    </slide>   
+    </slide>
+    <slide class="fill nobackground" style="background: url(images/canifileapi.png) no-repeat center;">
+        <aside class="note">
+            <section>
+                <ul>
+                    <li>Polyfill uses IndexedDB to provide capability: <a href="https://github.com/ebidel/idb.filesystem.js">https://github.com/ebidel/idb.filesystem.js</a>
+                </ul>        
+            </section>
+        </aside>
+
+        <hgroup>
+            <h2>FileSystem Browser Support: Polyfill</h2>
+        </hgroup>
+        <article class="flexbox">
+            
+            <footer class="source">
+                <p>Polyfill: <a href="https://github.com/ebidel/idb.filesystem.js">https://github.com/ebidel/idb.filesystem.js</a></p>
+                source: caniuse.com/#feat=offline-apps<br/>github.com/mastahyeti/browserstats
+            </footer>
+        </article>
+    </slide>
+ 
+    <slide>
+        <aside class="note">
+            <section>
+                <ul>
+                    <li>Because of the recent changes to the IndexedDB polyfill, you can now use the filesystem API polyfill on top of the IndexedDB polyfill</li>
+                    <li>See it working:<a href="https://github.com/jkleinsc/polypolyfile">https://github.com/jkleinsc/polypolyfile</a></li>
+                </ul>        
+            </section>
+        </aside>
+
+        <hgroup>
+            <h2>FileSystem Browser Support: PolyFill</h2>
+        </hgroup>
+        <article class="flexbox vcenter">
+            <img src="images/polypoly.jpg" alt="yo dawg i heard you like polyfills" title="yo dawg i heard you like polyfills" style="height:500px;">
+            <p>See it working:<a href="https://github.com/jkleinsc/polypolyfile">https://github.com/jkleinsc/polypolyfile</a></p>
+        </article>
+    </slide> 
     <slide class="fill nobackground" style="background-image: url(images/escape.jpg)">
         <aside class="note">
             <section>
@@ -805,6 +879,30 @@ var onlineStatus = <b>navigator.onLine,</b> win = Ext.get(window);
 });
             </pre>
         </article>
+    </slide>
+    <slide class="fill nobackground" style="background-image: url(images/escape_hatch.jpg)">
+        <aside class="note">
+            <section>
+                <ul>
+                    <li>So far we have looked at three rules for survival: 1) Fortified shelter(Application Cache), 2) Supplies(Indexed DB) and 3) Adequate weaponry(Filesystem API)</li>
+                    <li>Now let's look at our last rule of survival:  Use your escape plan.  Storing data offline becomes much more useful if we can also save it online</li>
+                    <li>In order to know what needs to be synched, we can mark records for upload</li>   
+                    <li>Next we need to know when we are online</li>                    
+                </ul>
+            </section>
+        </aside>      
+        <hgroup>
+            <h2 class="black-contrast">An Escape Plan: RemoteStore</h2>
+        </hgroup>
+        <article class="black-contrast">
+            <ul>
+                <li>When records are saved locally, they get marked as needing a server update</li>
+                <li>Use Ext.direct to attempt an immediate update</li>
+            </ul>
+        </article>
+        <footer class="source white">
+            source: www.flickr.com/photos/samsamcardiff/7326744462/
+        </footer>
     </slide>
     
     <slide class="fill nobackground" style="background-image: url(images/training.jpg);background-position:center; background-repeat: no-repeat; ">      
