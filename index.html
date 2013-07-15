@@ -203,6 +203,8 @@ URL: https://code.google.com/p/io-2012-slides
         <aside class="note">
             <section>
                 <ul>
+                    <li>In order to use the Application Cache, we need to first declare a manifest file in our HTML.</li>
+                    <li>The manifest file allows us to specify what files are needed for offline use.</li>
                     <li>Current HTML file included implicitly</li>
                     <li>Files always are served from application cache even when you are online</li>          
                     <li>404 files in the manifest will cause the manifest to fail</li>          
@@ -236,13 +238,10 @@ URL: https://code.google.com/p/io-2012-slides
         <aside class="note">
             <section>
                 <ul>
-                    <li>A couple of gotchas:
-                        <ul>
-                            <li>Changes to the manifest file update the application cache and btw its the only way</li>
-                            <li>Application cache works in conjuction with the existing browser cache</li>
-                        </ul>
-                    </li>
-                    <li>You can make the application manifest dynamic to make sure updates are picked up. </li>
+                    <li>The only way to update the application cache is to change the manifest file.</li>
+                    <li>You can make the application manifest dynamic to make sure updates are picked up.</li>
+                    <li>In this example the manifest file gets updated every time the app file gets updated via sencha cmd.</li>                    
+                    <li>Application cache works in conjuction with the existing browser cache.</li>
                 </ul>        
             </section>
         </aside>           
@@ -305,7 +304,7 @@ URL: https://code.google.com/p/io-2012-slides
         <aside class="note">
             <section>
                 <ul>
-                    <li>The 2nd rule for survival - make sure you have supplies and somewhere to put them.</li>
+                    <li>The 2nd rule for offline survival - make sure you have somewhere to put your supplies(your data).</li>
                     <li>IndexedDB is an NOSQL database -- its an object store which uses key-value pairs.</li>
                     <li>IndexedDB uses the <a href="http://www.w3.org/TR/html5/infrastructure.html#internal-structured-cloning-algorithm">structured cloning algorithm</a> to ensure objects get stored/retrieved properly (eg Blob goes in; Blob comes out)</li>
                     <li>Designed to support large amounts of data; has indexes for searching.</li>
@@ -672,8 +671,8 @@ function handleOpenFileSystem(newFileSystem) {
         <aside class="note">
             <section>
                 <ul>
-                    <li>This example shows pulling out a local file as a data uri.</li>
-                    <li>That data uri can then be sent via ajax and turned back into a file on the server via PHP.</li>
+                    <li>This example shows pulling out a local file as a data url.</li>
+                    <li>That data url can then be sent via ajax and turned back into a file on the server via PHP.</li>
                 </ul>
             </section>
         </aside>            
@@ -707,7 +706,8 @@ window.requestFileSystem(PERSISTENT, size, getFileAsDataURL, handleError);
             <section>
                 <ul>
                     <li>For ExtJS apps, I created a proxy for the FileSystem API</li>
-                    <li>That data uri can then be sent via ajax and turned back into a file on the server via PHP.</li>
+                    <li>Just need to declare size of file storage</li>
+                    <li>The proxy uses several special fields in each record</li>
                 </ul>
             </section>
         </aside>            
@@ -716,26 +716,23 @@ window.requestFileSystem(PERSISTENT, size, getFileAsDataURL, handleError);
         </hgroup>
         <article>
             <pre class="prettyprint" data-lang="javascript">
-&lt;script&gt;
     var store = Ext.create('Ext.data.TreeStore', {
-        autoSync: true,
-        autoLoad: true,
+        autoSync: true, autoLoad: true,
         <b>proxy: {
             type: 'filesystem', //Use Ext.data.proxy.FileSystem
             size: (1024*1024*1024) //Request 1GB of file storage
         },</b>
         root: {
-            text: 'My Photos',            
-            expanded: true
+            text: 'My Photos', expanded: true
         },
         <b>fields: [ //Fields used by FileSystem proxy
-            'file', //The actual File object
+            'file', //The actual File object; only used on add
+            'fileEntry', //The FileEntry object representing the file
             'text', //The name of the file
             'url' //filesystem url -- eg filesystem:http://example.com/persistent/myfile.png
         ]</b>
-    });
-&lt;/script&gt;
-            </pre>
+    });</pre>
+            Get the code: <a href="https://github.com/jkleinsc/Ext.data.proxy.FileSystem">https://github.com/jkleinsc/Ext.data.proxy.FileSystem</a>
         </article>
     </slide> 
     <slide class="fill nobackground" style="background: url(images/canifileapi.png) no-repeat center;">
@@ -743,7 +740,7 @@ window.requestFileSystem(PERSISTENT, size, getFileAsDataURL, handleError);
             <section>
                 <ul>
                     <li>Chrome only</li>
-                    <li>Polyfill uses IndexedDB to provide capability: <a href="https://github.com/ebidel/idb.filesystem.js">https://github.com/ebidel/idb.filesystem.js</a>
+                    <li>But, there is a polyfill...</li>
                 </ul>        
             </section>
         </aside>
@@ -757,11 +754,12 @@ window.requestFileSystem(PERSISTENT, size, getFileAsDataURL, handleError);
             </footer>
         </article>
     </slide>
-    <slide class="fill nobackground" style="background: url(images/canifileapi.png) no-repeat center;">
+    <slide class="fill nobackground" style="background: url(images/caniidxpoly.png) no-repeat center;">
         <aside class="note">
             <section>
                 <ul>
-                    <li>Polyfill uses IndexedDB to provide capability: <a href="https://github.com/ebidel/idb.filesystem.js">https://github.com/ebidel/idb.filesystem.js</a>
+                    <li>Polyfill uses IndexedDB to provide capability: <a href="https://github.com/ebidel/idb.filesystem.js">https://github.com/ebidel/idb.filesystem.js</a></li>
+                    <li>Note that Safari and Android are out of luck, but...</li>                        
                 </ul>        
             </section>
         </aside>
@@ -783,6 +781,7 @@ window.requestFileSystem(PERSISTENT, size, getFileAsDataURL, handleError);
             <section>
                 <ul>
                     <li>Because of the recent changes to the IndexedDB polyfill, you can now use the filesystem API polyfill on top of the IndexedDB polyfill</li>
+                    <li>Brings FileSystem API to most notably iOS, Safari and Android Browsers</li>
                     <li>See it working:<a href="https://github.com/jkleinsc/polypolyfile">https://github.com/jkleinsc/polypolyfile</a></li>
                 </ul>        
             </section>
@@ -802,8 +801,6 @@ window.requestFileSystem(PERSISTENT, size, getFileAsDataURL, handleError);
                 <ul>
                     <li>So far we have looked at three rules for survival: 1) Fortified shelter(Application Cache), 2) Supplies(Indexed DB) and 3) Adequate weaponry(Filesystem API)</li>
                     <li>Now let's look at our last rule of survival:  Use your escape plan.  Storing data offline becomes much more useful if we can also save it online</li>
-                    <li>In order to know what needs to be synched, we can mark records for upload</li>   
-                    <li>Next we need to know when we are online</li>                    
                 </ul>
             </section>
         </aside>      
@@ -834,7 +831,7 @@ window.requestFileSystem(PERSISTENT, size, getFileAsDataURL, handleError);
             <ul class="build">        
                 <li>
                     <b>window.navigator.onLine</b>
-                    <p style="font-style: italic;">"Returns false if the user agent is<br/> definitely offline (disconnected from the<br/> network). Returns true if the user agent<br/> might be online.
+                    <p style="font-style: italic;">"Returns false if the user agent is<br/> definitely offline (disconnected from the<br/> network). <b>Returns true if the user agent<br/> might be online.</b>
                         The events online and<br/> offline are fired when the value of this<br/> attribute changes."
                     </p>
                 </li>
@@ -884,10 +881,11 @@ var onlineStatus = <b>navigator.onLine,</b> win = Ext.get(window);
         <aside class="note">
             <section>
                 <ul>
-                    <li>So far we have looked at three rules for survival: 1) Fortified shelter(Application Cache), 2) Supplies(Indexed DB) and 3) Adequate weaponry(Filesystem API)</li>
-                    <li>Now let's look at our last rule of survival:  Use your escape plan.  Storing data offline becomes much more useful if we can also save it online</li>
-                    <li>In order to know what needs to be synched, we can mark records for upload</li>   
-                    <li>Next we need to know when we are online</li>                    
+                    <li>We keep track of all the modified fields using the modifiedFieldNames on a record, including date when field is modified.</li>
+                    <li>When records are saved locally, they get marked as needing a server update.</li>
+                    <li>Use Ext.direct to attempt an immediate update.</li>
+                    <li>If the user isn't online, and a delete occurs, we need to save the deleted record to another place so that we can delete it on the server later.</li>
+                    <li>When the user goes online, any offline updates are synchronized by using revisions.</li>
                 </ul>
             </section>
         </aside>      
@@ -895,9 +893,12 @@ var onlineStatus = <b>navigator.onLine,</b> win = Ext.get(window);
             <h2 class="black-contrast">An Escape Plan: RemoteStore</h2>
         </hgroup>
         <article class="black-contrast">
-            <ul>
-                <li>When records are saved locally, they get marked as needing a server update</li>
-                <li>Use Ext.direct to attempt an immediate update</li>
+            <ul class="build">
+                <li>Prepare records for server update</li>
+                <li>Ext.Direct</li>
+                <li>Offline deletes</li>
+                <li>Offline synchronization</li>
+                
             </ul>
         </article>
         <footer class="source white">
@@ -923,7 +924,7 @@ var onlineStatus = <b>navigator.onLine,</b> win = Ext.get(window);
     
     <slide class="thank-you-slide segue nobackground" style="background-image: url(images/background.jpg);">
         <article class="flexbox vleft auto-fadein">
-            <h2>Thank You!</h2>     
+            <h2>Thank You!</h2>
         </article>
         <p class="auto-fadein" data-config-contact>
       <!-- populated from slide_config.json -->
