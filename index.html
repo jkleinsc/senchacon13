@@ -132,18 +132,6 @@ URL: https://code.google.com/p/io-2012-slides
             <h2 class="black-contrast">The Solution</h2>
         </hgroup>      
         <article>
-            <ul class="black-contrast">
-                <li>ExtJS frontend</li>
-                <li>HTML5 features including:
-                    <ul>
-                        <li>Application cache</li>
-                        <li>IndexedDB</li>
-                        <li>FileSystem API</li>
-                        <li>Canvas</li>
-                    </ul>
-                </li>
-                <li>Google Chromebooks as deployment devices</li>
-            </ul>       
             <footer class="source"></footer>
         </article>
     </slide>        
@@ -291,7 +279,7 @@ URL: https://code.google.com/p/io-2012-slides
         </aside>
       
         <hgroup>
-            <h2>Application Cache Browser Support</h2>
+            <h2 class="black-contrast">Application Cache Browser Support</h2>
         </hgroup>
         <article class="flexbox">    
             <footer class="source">
@@ -544,7 +532,7 @@ idxRequest.onsuccess = function(successEvent) {//Found cat beards!!!!};
            ......
         }],    
         listeners: {
-            dbopen: init
+            <b>dbopen: init</b>
         }
     });
 &lt;/script&gt;
@@ -581,7 +569,7 @@ idxRequest.onsuccess = function(successEvent) {//Found cat beards!!!!};
         </aside>
 
         <hgroup>
-            <h2>IndexedDB Browser Support</h2>
+            <h2 class="black-contrast">IndexedDB Browser Support</h2>
         </hgroup>
         <article class="flexbox">    
             <footer class="source">
@@ -595,14 +583,14 @@ idxRequest.onsuccess = function(successEvent) {//Found cat beards!!!!};
                 <ul>
                     <li>Polyfill uses WebSQL to add support for IndexedDB to most browsers: <a href="http://nparashuram.com/IndexedDBShim/">http://nparashuram.com/IndexedDBShim</a>
                     <li>Most notably adds IOS and Android browser support</li>
-                    <li>76% global browser support</li>
-                    <li>Polyfill now partially supports Structured Cloning Algorithm: <a href="https://github.com/axemclion/IndexedDBShim/pull/68">GitHub pull request</a></li>
+                    <li>83% global browser support</li>
+                    <li>Due to my work, polyfill now partially supports Structured Cloning Algorithm: <a href="https://github.com/axemclion/IndexedDBShim/pull/68">GitHub pull request</a></li>
                 </ul>        
             </section>
         </aside>
 
         <hgroup>
-            <h2>IndexedDB Browser Support with Polyfill</h2>
+            <h2 class="black-contrast">IndexedDB Browser Support with Polyfill</h2>
         </hgroup>
         <article class="flexbox">    
             <footer class="source">
@@ -636,6 +624,7 @@ idxRequest.onsuccess = function(successEvent) {//Found cat beards!!!!};
                     <li>File storage can be PERSISTENT or TEMPORARY.</li>
                     <li>Chrome uses the requestQuota function to ask the user for a certain amount of storage.</li>
                     <li>This example reads a file from a file input field and stores it locally.</li>
+                    <li>In this application, before the file is saved to the local filesystem we use canvas to resize the image.</li>
                 </ul>        
             </section>
         </aside>      
@@ -746,7 +735,7 @@ window.requestFileSystem(PERSISTENT, size, getFileAsDataURL, handleError);
         </aside>
 
         <hgroup>
-            <h2>FileSystem Browser Support</h2>
+            <h2 class="black-contrast">FileSystem Browser Support</h2>
         </hgroup>
         <article class="flexbox">    
             <footer class="source">
@@ -754,7 +743,7 @@ window.requestFileSystem(PERSISTENT, size, getFileAsDataURL, handleError);
             </footer>
         </article>
     </slide>
-    <slide class="fill nobackground" style="background: url(images/caniidxpoly.png) no-repeat center;">
+    <slide class="fill nobackground" style="background: url(images/canifilepoly.png) no-repeat center;">
         <aside class="note">
             <section>
                 <ul>
@@ -765,7 +754,7 @@ window.requestFileSystem(PERSISTENT, size, getFileAsDataURL, handleError);
         </aside>
 
         <hgroup>
-            <h2>FileSystem Browser Support: Polyfill</h2>
+            <h2 class="black-contrast">FileSystem Browser Support: Polyfill</h2>
         </hgroup>
         <article class="flexbox">
             
@@ -788,7 +777,7 @@ window.requestFileSystem(PERSISTENT, size, getFileAsDataURL, handleError);
         </aside>
 
         <hgroup>
-            <h2>FileSystem Browser Support: PolyFill</h2>
+            <h2>FileSystem Browser Support: Polyfill</h2>
         </hgroup>
         <article class="flexbox vcenter">
             <img src="images/polypoly.jpg" alt="yo dawg i heard you like polyfills" title="yo dawg i heard you like polyfills" style="height:500px;">
