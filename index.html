@@ -345,9 +345,9 @@ var myDB, dbVersion = 1, <b>openRequest = window.indexedDB.open('MyDatabase', db
 openRequest.onerror = function(errorEvent) {
     //Async response, something didn't work
 }
-openRequest.onsuccess = function(successEvent) {    
+<b>openRequest.onsuccess = function(successEvent) {    
     myDB = successEvent.target.result; //Async response, grab the database from the request.
-    <b>doStuffAfterOpen(); //Database is ready for use</b>
+    doStuffAfterOpen(); //Database is ready for use</b>
 }
 <b>openRequest.onupgradeneeded = function(upgradeEvent) { //Version change!!</b>
     myDB = upgradeEvent.target.result;
@@ -388,8 +388,8 @@ function doStuffAfterOpen() { //This will only work after the async call to open
     addRequest.onsuccess = function(successEvent) {//Async response, yes you can haz cheezburger};
     addRequest.onerror = function(errorEvent) {//Async response, no cheezburger for you};
 
-    <b>var getRequest = lolStore.get(1); //Get by id</b>
-    getRequest.onsuccess = function(successEvent) { //Async response        
+    <b>var getRequest = lolStore.get(1); //Get by id
+    getRequest.onsuccess = function(successEvent) { //Async response</b>        
         console.log("Funny kitty here: " + getRequest.result.url);
     };
     getRequest.onerror = function(errorEvent) {//Async response, no funny kitties here};
@@ -484,17 +484,17 @@ idxRequest.onsuccess = function(successEvent) {//Found cat beards!!!!};
             <pre class="prettyprint" data-lang="javascript">
 &lt;script&gt;
         employeeStore.load({
-            params: { //Load store via exact index value                                
-                <b>index: 'companyIdIdx', 
-                indexValue: 123</b>
-            }
+            <b>params: { //Load store via exact index value                                
+                index: 'companyIdIdx', 
+                indexValue: 123
+            }</b>
         });
         employeeStore.load({
-            params: { //Search for names between C - H
-                <b>index: 'firstNameIdx', 
+            <b>params: { //Search for names between C - H
+             index: 'firstNameIdx', 
                 indexLower: 'C', 
-                indexUpper: 'H'</b>
-            }
+                indexUpper: 'H'
+            }</b>
         });        
 &lt;/script&gt;
             </pre>
